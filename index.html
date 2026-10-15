@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ДФС — 16 состояний: картины и музыка</title>
+<meta name="description" content="Каталог по методике ДФС И. Н. Калинаускаса: картины, музыка и описания для каждого из 16 состояний.">
+<meta name="theme-color" content="#f6f3ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151c" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #f6f3ec;        --bg-rgb: 246, 243, 236;
+  --surface: #ffffff;
+  --surface-2: #f3f0e8;
+  --mat: #ebe7dc;
+  --ink: #1c2230;       --ink-rgb: 28, 34, 48;
+  --muted: #5f6878;
+  --line: #e3ded2;
+  --shadow: 0 1px 2px rgba(28, 34, 48, .06), 0 10px 28px rgba(28, 34, 48, .07);
+  --A: #2563eb; --A-rgb: 37, 99, 235;   --A-ink: #ffffff;
+  --B: #16a34a; --B-rgb: 22, 163, 74;   --B-ink: #ffffff;
+  --C: #f4b400; --C-rgb: 244, 180, 0;   --C-ink: #2a2000;
+  --D: #dc2626; --D-rgb: 220, 38, 38;   --D-ink: #ffffff;
+  --radius: 16px;
+  --maxw: 1480px;
+  --gutter: clamp(14px, 3vw, 28px);
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12151c;      --bg-rgb: 18, 21, 28;
+    --surface: #1b1f29;
+    --surface-2: #232835;
+    --mat: #10131a;
+    --ink: #e9edf4;     --ink-rgb: 233, 237, 244;
+    --muted: #a3adbd;
+    --line: #2e3442;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 28px rgba(0, 0, 0, .35);
+    --A: #5b8cff; --A-rgb: 91, 140, 255;  --A-ink: #0b1020;
+    --B: #34c768; --B-rgb: 52, 199, 104;  --B-ink: #06210f;
+    --C: #f4b400; --C-rgb: 244, 180, 0;   --C-ink: #2a2000;
+    --D: #ff6b6b; --D-rgb: 255, 107, 107; --D-ink: #2b0707;
+  }
+}
+.r-A { --rc: var(--A); --rc-rgb: var(--A-rgb); --rc-ink: var(--A-ink); }
+.r-B { --rc: var(--B); --rc-rgb: var(--B-rgb); --rc-ink: var(--B-ink); }
+.r-C { --rc: var(--C); --rc-rgb: var(--C-rgb); --rc-ink: var(--C-ink); }
+.r-D { --rc: var(--D); --rc-rgb: var(--D-rgb); --rc-ink: var(--D-ink); }
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.55 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+}
+button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid rgba(var(--ink-rgb), .55); outline-offset: 2px; border-radius: 6px; }
+.wrap {
+  max-width: var(--maxw); margin: 0 auto;
+  padding-left: max(var(--gutter), env(safe-area-inset-left));
+  padding-right: max(var(--gutter), env(safe-area-inset-right));
+}
+
+/* ---------- Шапка страницы ---------- */
+.hero { padding-top: clamp(22px, 5vw, 48px); padding-bottom: clamp(14px, 2.6vw, 22px); text-align: center; }
+.hero h1 { margin: 0; font: 700 clamp(28px, 5.4vw, 46px)/1.1 var(--serif); letter-spacing: -.01em; }
+.hero__method { margin: 8px auto 0; max-width: 40ch; color: var(--muted); font-size: clamp(14.5px, 2.1vw, 17px); }
+
+/* ---------- Панель фильтров (всегда на виду) ---------- */
+.bar-sentinel { height: 1px; margin-bottom: -1px; }
+.bar {
+  position: sticky; top: 0; z-index: 30;
+  background: rgba(var(--bg-rgb), .92);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+  transition: border-color .2s, box-shadow .2s;
+}
+.bar.is-stuck { border-bottom-color: var(--line); box-shadow: 0 6px 18px rgba(28, 34, 48, .08); }
+.bar__inner { display: flex; flex-wrap: wrap; gap: 2px 28px; padding-top: 8px; padding-bottom: 8px; }
+.fgroup { display: flex; align-items: center; gap: 10px; max-width: 100%; min-width: 0; }
+.fgroup__label { flex: none; width: 46px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.chips { position: relative; display: flex; gap: 6px; padding: 3px 2px; min-width: 0; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+.chips::-webkit-scrollbar { display: none; }
+.chips.fade-r { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
+.chips.fade-l { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent); }
+.chips.fade-l.fade-r { -webkit-mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent); }
+.chip {
+  flex: none; display: inline-flex; align-items: center; gap: 7px;
+  height: 36px; padding: 0 14px;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--surface); font-size: 14px; font-weight: 500; white-space: nowrap;
+  transition: background .15s, color .15s, border-color .15s, transform .1s;
+}
+.chip:hover { border-color: rgba(var(--ink-rgb), .35); }
+.chip:active { transform: scale(.97); }
+.chip__tag {
+  display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px;
+  border-radius: 6px; background: var(--surface-2); font-size: 12px; font-weight: 700;
+}
+.chip--r .chip__tag { background: var(--rc); color: var(--rc-ink); border-radius: 50%; padding: 0; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip[aria-pressed="true"] .chip__tag { background: rgba(var(--bg-rgb), .22); color: var(--bg); }
+.chip--r[aria-pressed="true"] { background: var(--rc); color: var(--rc-ink); border-color: var(--rc); }
+.chip--r[aria-pressed="true"] .chip__tag { background: rgba(0, 0, 0, .16); color: var(--rc-ink); }
+
+.toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 16px;
+  padding-top: 12px; padding-bottom: 12px;
+}
+.toolbar__count { margin: 0; color: var(--muted); font-size: 14.5px; }
+.toolbar__actions { display: flex; flex-wrap: wrap; gap: 0 18px; }
+.linkbtn {
+  background: none; border: 0; padding: 8px 0; font-size: 14.5px; font-weight: 600;
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px;
+  text-decoration-color: rgba(var(--ink-rgb), .35);
+}
+.linkbtn:hover { text-decoration-color: currentColor; }
+.linkbtn[hidden] { display: none; }
+
+/* ---------- Карточки: в одном ряду всё на одной высоте ---------- */
+.grid {
+  display: grid; gap: 20px; align-items: stretch;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  padding-bottom: 48px;
+}
+@media (min-width: 1280px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.card {
+  display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow: hidden;
+  animation: rise .35s ease both;
+}
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.card[hidden] { display: none; }
+.card__head { display: flex; align-items: center; gap: 12px; min-height: 68px; padding: 12px 16px; border-top: 4px solid var(--rc); }
+.badge {
+  flex: none; display: inline-grid; place-items: center; min-width: 48px; height: 34px; padding: 0 12px;
+  border-radius: 999px; background: var(--rc); color: var(--rc-ink);
+  font-weight: 800; font-size: 17px; letter-spacing: .02em;
+}
+.card__meta { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.card__rhythm { font-weight: 700; font-size: 16px; }
+.card__rhythm span { display: inline-block; min-width: 1.1em; }
+.card__center { color: var(--muted); font-size: 13.5px; }
+
+/* Картины: одинаковые плитки одной высоты, картина целиком (без обрезки) */
+.pics { padding: 0 16px 16px; }
+.pics__row {
+  display: grid; gap: 8px; aspect-ratio: 1.85 / 1;
+  grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr));
+}
+.pic {
+  position: relative; display: block; width: 100%; height: 100%; min-width: 0; padding: 0; border: 0;
+  border-radius: 10px; overflow: hidden; background: var(--mat); cursor: zoom-in;
+  box-shadow: inset 0 0 0 1px rgba(var(--ink-rgb), .08);
+  transition: transform .15s, box-shadow .15s;
+}
+.pic:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px rgba(var(--ink-rgb), .08), 0 8px 18px rgba(0, 0, 0, .2); }
+.pic img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.pic__zoom {
+  position: absolute; right: 6px; bottom: 6px; width: 26px; height: 26px; display: grid; place-items: center;
+  border-radius: 50%; background: rgba(0, 0, 0, .55); color: #fff; opacity: .9; transition: opacity .15s, transform .15s;
+  pointer-events: none;
+}
+.pic:hover .pic__zoom { transform: scale(1.1); }
+
+/* Описание — скрыто, пока не раскроют */
+.desc { margin: 0 12px; }
+.desc__toggle {
+  width: 100%; display: flex; align-items: center; gap: 10px; text-align: left;
+  min-height: 48px; padding: 8px 12px; border-radius: 12px;
+  border: 1px solid rgba(var(--rc-rgb), .45);
+  background: rgba(var(--rc-rgb), .09);
+  font-weight: 600; font-size: 15px;
+  transition: background .15s;
+}
+.desc__toggle:hover { background: rgba(var(--rc-rgb), .17); }
+.desc__icon { flex: none; width: 20px; height: 20px; color: var(--muted); }
+.desc__label { flex: 1; }
+.desc__hint { flex: none; font-size: 13.5px; font-weight: 600; color: var(--muted); }
+.chev { flex: none; width: 18px; height: 18px; transition: transform .25s; }
+.desc.is-open .chev { transform: rotate(180deg); }
+.desc__panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .28s ease; }
+.desc.is-open .desc__panel { grid-template-rows: 1fr; }
+.desc__inner { overflow: hidden; min-height: 0; }
+.desc__text { margin: 0; padding: 14px 6px 6px; font-size: 16px; line-height: 1.65; }
+
+/* Музыка */
+.music { padding: 16px 12px 14px; }
+.music__title { margin: 0 4px 8px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.tracks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.track { border-radius: 12px; background-color: var(--surface-2); transition: background-color .15s; }
+.track.is-open { background-image: linear-gradient(rgba(var(--rc-rgb), .13), rgba(var(--rc-rgb), .13)); }
+.track__btn {
+  width: 100%; min-height: 78px; display: flex; align-items: center; gap: 12px; text-align: left;
+  padding: 8px 12px 8px 10px; background: none; border: 0; border-radius: 12px;
+}
+.track__play {
+  flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%;
+  background: var(--rc); color: var(--rc-ink); transition: transform .15s;
+}
+.track__btn:hover .track__play { transform: scale(1.08); }
+.track__play svg { width: 16px; height: 16px; }
+.track__play .i-play { margin-left: 2px; }
+.track__play .i-close { display: none; }
+.track.is-open .i-play { display: none; }
+.track.is-open .i-close { display: block; }
+.track__text { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
+.track__name { font-weight: 600; font-size: 15px; }
+.track__artist { color: var(--muted); font-size: 13.5px; }
+.track__panel { padding: 2px 12px 12px; }
+.track__panel[hidden] { display: none; }
+.player { position: relative; min-height: 100px; border-radius: 10px; background: var(--surface); }
+.player__loading { position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; color: var(--muted); font-size: 13px; pointer-events: none; }
+.player.is-ready .player__loading { display: none; }
+.player iframe { position: relative; z-index: 1; display: block; width: 100%; height: 100px; border: 0; border-radius: 10px; background: transparent; }
+.player__note { margin: 8px 2px 0; font-size: 13px; color: var(--muted); }
+.player__links { margin: 8px 2px 0; font-size: 14px; color: var(--muted); line-height: 1.9; }
+.player__links a { display: inline-block; padding: 0 2px; font-weight: 600; color: var(--ink); text-underline-offset: 3px; white-space: nowrap; }
+
+.footer { padding: 8px 0 max(40px, env(safe-area-inset-bottom)); text-align: center; color: var(--muted); font-size: 14px; }
+
+/* ---------- Просмотр картины ---------- */
+.lb {
+  position: fixed; top: 0; left: 0; right: 0; height: 100vh; height: 100dvh; z-index: 100;
+  display: none; align-items: center; justify-content: center; padding: 16px;
+  background: rgba(8, 10, 14, .94); overscroll-behavior: contain;
+}
+.lb.is-open { display: flex; animation: fade .18s ease both; }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+.lb__box { display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 100%; }
+.lb__img { display: block; max-width: none; border-radius: 8px; box-shadow: 0 20px 60px rgba(0, 0, 0, .6); background: #222; -webkit-user-select: none; user-select: none; }
+.lb__cap { color: #e9edf4; font-size: 15px; text-align: center; }
+.lb__cap b { font-weight: 700; }
+.lb__btn {
+  position: absolute; display: grid; place-items: center; width: 48px; height: 48px; border: 0; border-radius: 50%;
+  background: rgba(255, 255, 255, .16); color: #fff; transition: background .15s;
+}
+.lb__btn:hover { background: rgba(255, 255, 255, .28); }
+.lb__btn svg { width: 22px; height: 22px; }
+.lb__close { top: max(14px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); }
+.lb__prev { left: max(14px, env(safe-area-inset-left)); top: 50%; margin-top: -24px; }
+.lb__next { right: max(14px, env(safe-area-inset-right)); top: 50%; margin-top: -24px; }
+.lb__btn[hidden] { display: none; }
+body.lb-open { overflow: hidden; }
+
+/* ---------- Телефоны ---------- */
+@media (max-width: 640px) {
+  .lb__prev, .lb__next { top: auto; margin-top: 0; bottom: max(16px, env(safe-area-inset-bottom)); }
+  .lb__prev { left: calc(50% - 58px); }
+  .lb__next { right: calc(50% - 58px); }
+  .fgroup { width: 100%; gap: 6px; }
+  .fgroup__label { width: 40px; font-size: 11px; }
+  .chip { height: 36px; padding: 0 12px; font-size: 13.5px; }
+  .bar__inner { gap: 0; padding-top: 4px; padding-bottom: 4px; }
+  .card__head { padding: 10px 14px; }
+  .pics { padding: 0 14px 14px; }
+  .desc { margin: 0 10px; }
+  .music { padding: 14px 10px 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* ---------- Печать: всё раскрыто, без плееров ---------- */
+@media print {
+  body { background: #fff; color: #000; }
+  .bar, .bar-sentinel, .toolbar, .track__panel, .lb, .pic__zoom, .chev, .desc__hint { display: none !important; }
+  .card { box-shadow: none; break-inside: avoid; animation: none; }
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .desc__panel { grid-template-rows: 1fr !important; }
+  .desc__toggle { background: none; border: 0; padding-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero wrap">
+  <h1>ДФС — 16 состояний</h1>
+  <p class="hero__method">Методика дифференцированных функциональных состояний И.&nbsp;Н.&nbsp;Калинаускаса</p>
+</header>
+
+<div class="bar-sentinel" id="sentinel"></div>
+<nav class="bar" id="bar" aria-label="Фильтры состояний">
+  <div class="wrap bar__inner">
+    <div class="fgroup" role="group" aria-label="Центр">
+      <span class="fgroup__label">Центр</span>
+      <div class="chips" id="chips-center"></div>
+    </div>
+    <div class="fgroup" role="group" aria-label="Ритм">
+      <span class="fgroup__label">Ритм</span>
+      <div class="chips" id="chips-rhythm"></div>
+    </div>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="toolbar">
+    <p class="toolbar__count" id="count" aria-live="polite"></p>
+    <div class="toolbar__actions">
+      <button class="linkbtn" id="reset" type="button" hidden>Сбросить</button>
+      <button class="linkbtn" id="toggle-all" type="button">Раскрыть описания</button>
+    </div>
+  </div>
+  <section class="grid" id="grid" aria-label="Состояния"></section>
+  <noscript><p>Для работы каталога нужен включённый JavaScript.</p></noscript>
+</main>
+
+<footer class="footer wrap">Методика ДФС — И. Н. Калинаускас. Создано для изучающих ДФС.</footer>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Просмотр картины">
+  <button class="lb__btn lb__close" id="lb-close" type="button" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <button class="lb__btn lb__prev" id="lb-prev" type="button" aria-label="Предыдущая картина"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <button class="lb__btn lb__next" id="lb-next" type="button" aria-label="Следующая картина"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+  <div class="lb__box">
+    <img class="lb__img" id="lb-img" alt="" draggable="false">
+    <div class="lb__cap" id="lb-cap"></div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var CENTERS = { 1: 'Витальный', 2: 'Эмоциональный', 3: 'Ментальный', 4: 'Аккорд' };
+  var RHYTHMS = {
+    A: { g: '∞', n: 'Бесконечность' },
+    B: { g: '~', n: 'Поток' },
+    C: { g: '▪', n: 'Дискретность' },
+    D: { g: '⚡', n: 'Распад' }
+  };
+  var ICON = {
+    chev: '<svg class="chev" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    book: '<svg class="desc__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15zM4 20.5A2.5 2.5 0 0 0 6.5 18H20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    play: '<svg class="i-play" viewBox="0 0 20 20" aria-hidden="true"><path d="M6.5 3.6v12.8a.7.7 0 0 0 1.07.6l10.1-6.4a.7.7 0 0 0 0-1.2L7.57 3a.7.7 0 0 0-1.07.6z" fill="currentColor"/></svg>',
+    close: '<svg class="i-close" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+    zoom: '<svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21M10.5 7.5v6M7.5 10.5h6"/></svg>'
+  };
+
+  function $(s, el) { return (el || document).querySelector(s); }
+  function $$(s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  /* ---------- Панель фильтров ---------- */
+  var filter = { c: '', r: '' };
+  var centerBox = $('#chips-center'), rhythmBox = $('#chips-rhythm');
+
+  function chip(kind, value, html, cls) {
+    return '<button type="button" class="chip ' + (cls || '') + '" data-kind="' + kind + '" data-v="' + value + '" aria-pressed="false">' + html + '</button>';
+  }
+  centerBox.innerHTML = chip('c', '', 'Все') + [1, 2, 3, 4].map(function (n) {
+    return chip('c', n, '<span class="chip__tag">' + n + '</span>' + CENTERS[n], 'chip--c');
+  }).join('');
+  rhythmBox.innerHTML = chip('r', '', 'Все') + ['A', 'B', 'C', 'D'].map(function (k) {
+    return chip('r', k, '<span class="chip__tag">' + k + '</span>' + RHYTHMS[k].g + ' ' + RHYTHMS[k].n, 'chip--r r-' + k);
+  }).join('');
+
+  // Затухание у края — подсказывает, что ряд фильтров можно листать
+  function updateFades(box) {
+    box.classList.toggle('fade-l', box.scrollLeft > 2);
+    box.classList.toggle('fade-r', box.scrollLeft + box.clientWidth < box.scrollWidth - 2);
+  }
+  [centerBox, rhythmBox].forEach(function (box) {
+    box.addEventListener('scroll', function () { updateFades(box); }, { passive: true });
+    updateFades(box);
+  });
+  window.addEventListener('resize', function () { updateFades(centerBox); updateFades(rhythmBox); });
+
+  // Выбранный фильтр всегда показываем в ряду, даже если он был за краем экрана
+  function revealActive(smooth) {
+    [centerBox, rhythmBox].forEach(function (box) {
+      var a = $('.chip[aria-pressed="true"]', box);
+      if (!a || box.scrollWidth <= box.clientWidth) return;
+      var left = Math.max(0, a.offsetLeft - (box.clientWidth - a.offsetWidth) / 2);
+      if (box.scrollTo) box.scrollTo({ left: left, behavior: smooth ? 'smooth' : 'auto' }); else box.scrollLeft = left;
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.chip');
+    if (!b) return;
+    var kind = b.getAttribute('data-kind'), v = b.getAttribute('data-v');
+    filter[kind] = (filter[kind] === v) ? '' : v;   // повторный клик по выбранному — снимает фильтр
+    applyFilter(true);
+  });
+  $('#reset').addEventListener('click', function () { filter.c = ''; filter.r = ''; applyFilter(true); });
+
+  function readHash() {
+    var h = '';
+    try { h = decodeURIComponent(location.hash.replace(/^#/, '')); } catch (err) { h = ''; }
+    var m;
+    filter.c = ''; filter.r = '';
+    if ((m = /^([1-4])([A-D])$/i.exec(h))) { filter.c = m[1]; filter.r = m[2].toUpperCase(); }
+    else if ((m = /^c([1-4])$/i.exec(h))) { filter.c = m[1]; }
+    else if ((m = /^r([A-D])$/i.exec(h))) { filter.r = m[1].toUpperCase(); }
+  }
+  function writeHash() {
+    var h = '';
+    if (filter.c && filter.r) h = filter.c + filter.r;
+    else if (filter.c) h = 'c' + filter.c;
+    else if (filter.r) h = 'r' + filter.r;
+    try { history.replaceState(null, '', h ? '#' + h : location.pathname + location.search); } catch (err) { /* file:// в части браузеров */ }
+  }
+
+  /* ---------- Карточки ---------- */
+  var grid = $('#grid');
+
+  function trackHTML(sid, t, i) {
+    var pid = 'p-' + sid + '-' + i;
+    return '<li class="track">' +
+      '<button type="button" class="track__btn" aria-expanded="false" aria-controls="' + pid + '">' +
+        '<span class="track__play">' + ICON.play + ICON.close + '</span>' +
+        '<span class="track__text"><span class="track__name">' + esc(t.t) + '</span><span class="track__artist">' + esc(t.a) + '</span></span>' +
+      '</button>' +
+      '<div class="track__panel" id="' + pid + '" hidden></div>' +
+    '</li>';
+  }
+
+  function cardHTML(s) {
+    var pics = s.imgs.map(function (im, i) {
+      return '<button type="button" class="pic" data-state="' + s.id + '" data-i="' + i + '" aria-label="Увеличить картину ' + (i + 1) + ' для состояния ' + s.id + '">' +
+        '<img src="' + im.src + '" width="' + im.w + '" height="' + im.h + '" loading="lazy" decoding="async" alt="Картина ' + (i + 1) + ' для состояния ' + s.id + '">' +
+        '<span class="pic__zoom">' + ICON.zoom + '</span></button>';
+    }).join('');
+    return '<article class="card r-' + s.r + '" id="s-' + s.id + '" data-c="' + s.c + '" data-r="' + s.r + '" aria-labelledby="h-' + s.id + '">' +
+      '<header class="card__head">' +
+        '<span class="badge" id="h-' + s.id + '">' + s.id + '</span>' +
+        '<div class="card__meta"><span class="card__rhythm"><span aria-hidden="true">' + RHYTHMS[s.r].g + '</span> ' + RHYTHMS[s.r].n + '</span>' +
+        '<span class="card__center">Центр ' + s.c + ' · ' + CENTERS[s.c] + '</span></div>' +
+      '</header>' +
+      '<div class="pics"><div class="pics__row" style="--n:' + s.imgs.length + '">' + pics + '</div></div>' +
+      '<div class="desc">' +
+        '<button type="button" class="desc__toggle" aria-expanded="false" aria-controls="d-' + s.id + '">' +
+          ICON.book + '<span class="desc__label">Описание состояния</span><span class="desc__hint">Показать</span>' + ICON.chev +
+        '</button>' +
+        '<div class="desc__panel" id="d-' + s.id + '" role="region" aria-label="Описание состояния ' + s.id + '" inert><div class="desc__inner"><p class="desc__text">' + esc(s.desc) + '</p></div></div>' +
+      '</div>' +
+      '<div class="music"><h3 class="music__title">Музыка</h3><ul class="tracks">' +
+        s.tracks.map(function (t, i) { return trackHTML(s.id, t, i); }).join('') +
+      '</ul></div>' +
+    '</article>';
+  }
+  grid.innerHTML = STATES.map(cardHTML).join('');
+
+  /* ---------- Применение фильтра ---------- */
+  var count = $('#count'), resetBtn = $('#reset'), allBtn = $('#toggle-all');
+
+  function visibleCards() { return $$('.card:not([hidden])', grid); }
+
+  function applyFilter(userAction) {
+    $$('.chip').forEach(function (b) {
+      var kind = b.getAttribute('data-kind');
+      b.setAttribute('aria-pressed', String(filter[kind] === b.getAttribute('data-v')));
+    });
+    var shown = 0;
+    $$('.card', grid).forEach(function (card) {
+      var ok = (!filter.c || card.getAttribute('data-c') === String(filter.c)) &&
+               (!filter.r || card.getAttribute('data-r') === filter.r);
+      if (ok && card.hidden) { card.style.animation = 'none'; card.offsetWidth; card.style.animation = ''; }
+      card.hidden = !ok;
+      if (ok) shown++;
+      if (!ok) closeAllTracksIn(card);
+    });
+    var filtered = !!(filter.c || filter.r);
+    count.textContent = filtered ? 'Показано ' + shown + ' из ' + STATES.length : 'Все ' + STATES.length + ' состояний';
+    resetBtn.hidden = !filtered;
+    syncAllBtn();
+    writeHash();
+    revealActive(!!userAction);
+    if (userAction) {
+      var bar = $('#bar'), top = grid.getBoundingClientRect().top + window.pageYOffset - bar.offsetHeight - 52;
+      if (window.pageYOffset > top) window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }
+  }
+
+  /* ---------- Описания ---------- */
+  function setDesc(box, open) {
+    box.classList.toggle('is-open', open);
+    $('.desc__toggle', box).setAttribute('aria-expanded', String(open));
+    $('.desc__hint', box).textContent = open ? 'Скрыть' : 'Показать';
+    var p = $('.desc__panel', box);
+    if (open) p.removeAttribute('inert'); else p.setAttribute('inert', '');
+  }
+  function syncAllBtn() {
+    var v = visibleCards();
+    var allOpen = v.length > 0 && v.every(function (c) { return $('.desc', c).classList.contains('is-open'); });
+    allBtn.textContent = allOpen ? 'Свернуть описания' : 'Раскрыть описания';
+    allBtn.setAttribute('data-open', allOpen ? '1' : '0');
+  }
+  allBtn.addEventListener('click', function () {
+    var open = allBtn.getAttribute('data-open') !== '1';
+    visibleCards().forEach(function (c) { setDesc($('.desc', c), open); });
+    syncAllBtn();
+  });
+
+  /* ---------- Музыка ---------- */
+  function playerHTML(t) {
+    var q = encodeURIComponent(t.a + ' ' + t.t);
+    var yt = '<a href="https://www.youtube.com/results?search_query=' + q + '" target="_blank" rel="noopener">YouTube ↗</a>';
+    var vk = '<a href="https://vk.com/audio?q=' + q + '" target="_blank" rel="noopener">VK ↗</a>';
+    var html = '';
+    if (t.ym) {
+      var p = t.ym.split(':');
+      var ym = '<a href="https://music.yandex.ru/album/' + p[1] + '/track/' + p[0] + '" target="_blank" rel="noopener">Яндекс Музыка ↗</a>';
+      html += '<div class="player"><span class="player__loading">Загружаем плеер…</span><iframe src="https://music.yandex.ru/iframe/track/' + p[0] + '/' + p[1] + '" title="Плеер: ' + esc(t.t) + ' — ' + esc(t.a) + '" allow="autoplay *; encrypted-media *; clipboard-write"></iframe></div>';
+      if (t.note) html += '<p class="player__note">' + esc(t.note) + '</p>';
+      html += '<p class="player__links">Слушать целиком: ' + ym + ' ' + yt + ' ' + vk + '</p>';
+    } else {
+      html += '<p class="player__note">' + esc(t.note || 'Встроенного плеера для этого трека нет.') + '</p>';
+      html += '<p class="player__links">Слушать: ' + yt + ' ' + vk + '</p>';
+    }
+    return html;
+  }
+  function closeTrack(li) {
+    li.classList.remove('is-open');
+    $('.track__btn', li).setAttribute('aria-expanded', 'false');
+    var panel = $('.track__panel', li);
+    panel.hidden = true;
+    panel.innerHTML = '';              // убираем плеер — музыка останавливается
+  }
+  function closeAllTracksIn(root) { $$('.track.is-open', root).forEach(closeTrack); }
+
+  grid.addEventListener('click', function (e) {
+    var tb = e.target.closest('.track__btn');
+    if (tb) {
+      var li = tb.parentNode;
+      var wasOpen = li.classList.contains('is-open');
+      closeAllTracksIn(grid);          // одновременно играет только один трек
+      if (!wasOpen) {
+        var card = li.closest('.card'), sid = card.id.slice(2);
+        var idx = $$('.track', card).indexOf(li);
+        var t = STATES.filter(function (s) { return s.id === sid; })[0].tracks[idx];
+        var panel = $('.track__panel', li);
+        panel.innerHTML = playerHTML(t);
+        var frame = $('iframe', panel);
+        if (frame) frame.addEventListener('load', function () { $('.player', panel).classList.add('is-ready'); });
+        panel.hidden = false;
+        li.classList.add('is-open');
+        tb.setAttribute('aria-expanded', 'true');
+      }
+      return;
+    }
+    var db = e.target.closest('.desc__toggle');
+    if (db) {
+      var box = db.parentNode;
+      setDesc(box, !box.classList.contains('is-open'));
+      syncAllBtn();
+      return;
+    }
+    var pb = e.target.closest('.pic');
+    if (pb) openLightbox(pb.getAttribute('data-state'), +pb.getAttribute('data-i'), pb);
+  });
+
+  /* ---------- Просмотр картины ---------- */
+  var lb = $('#lb'), lbImg = $('#lb-img'), lbCap = $('#lb-cap'), lbPrev = $('#lb-prev'), lbNext = $('#lb-next'), lbClose = $('#lb-close');
+  var lbState = null, lbIdx = 0, lbOpener = null;
+
+  // Исходные картины небольшие: растягиваем не более чем в 1,7 раза и вписываем в экран
+  function fitLb() {
+    if (!lbState) return;
+    var im = lbState.imgs[lbIdx];
+    var k = Math.min(1.7, (window.innerWidth * 0.94) / im.w, (window.innerHeight - 150) / im.h);
+    lbImg.style.width = Math.round(im.w * k) + 'px';
+    lbImg.style.height = Math.round(im.h * k) + 'px';
+  }
+  window.addEventListener('resize', function () { if (lb.classList.contains('is-open')) fitLb(); });
+
+  function showLb() {
+    var im = lbState.imgs[lbIdx];
+    lbImg.src = im.src;
+    lbImg.alt = 'Картина ' + (lbIdx + 1) + ' для состояния ' + lbState.id;
+    fitLb();
+    lbCap.innerHTML = '<b>' + lbState.id + '</b> · ' + RHYTHMS[lbState.r].g + ' ' + RHYTHMS[lbState.r].n + ' · ' + CENTERS[lbState.c] +
+      (lbState.imgs.length > 1 ? ' · ' + (lbIdx + 1) + ' из ' + lbState.imgs.length : '');
+    lbPrev.hidden = lbNext.hidden = lbState.imgs.length < 2;
+  }
+  function openLightbox(sid, i, opener) {
+    lbState = STATES.filter(function (s) { return s.id === sid; })[0];
+    lbIdx = i; lbOpener = opener;
+    showLb();
+    lb.classList.add('is-open');
+    document.body.classList.add('lb-open');
+    lbClose.focus();
+  }
+  function closeLightbox() {
+    lb.classList.remove('is-open');
+    document.body.classList.remove('lb-open');
+    lbImg.removeAttribute('src');
+    if (lbOpener) lbOpener.focus();
+  }
+  function stepLb(d) {
+    if (!lbState || lbState.imgs.length < 2) return;
+    lbIdx = (lbIdx + d + lbState.imgs.length) % lbState.imgs.length;
+    showLb();
+  }
+  lbClose.addEventListener('click', closeLightbox);
+  lbPrev.addEventListener('click', function (e) { e.stopPropagation(); stepLb(-1); });
+  lbNext.addEventListener('click', function (e) { e.stopPropagation(); stepLb(1); });
+  lb.addEventListener('click', function (e) { if (e.target === lb || e.target.classList.contains('lb__box')) closeLightbox(); });
+  document.addEventListener('keydown', function (e) {
+    if (!lb.classList.contains('is-open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft') stepLb(-1);
+    else if (e.key === 'ArrowRight') stepLb(1);
+  });
+  // Свайп пальцем влево/вправо — следующая/предыдущая картина
+  var tx = 0, ty = 0;
+  lb.addEventListener('touchstart', function (e) { var t = e.changedTouches[0]; tx = t.clientX; ty = t.clientY; }, { passive: true });
+  lb.addEventListener('touchend', function (e) {
+    var t = e.changedTouches[0], dx = t.clientX - tx, dy = t.clientY - ty;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) stepLb(dx < 0 ? 1 : -1);
+  }, { passive: true });
+
+  /* ---------- Тень у панели, когда она «прилипла» ---------- */
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (en) {
+      $('#bar').classList.toggle('is-stuck', !en[0].isIntersecting);
+    }).observe($('#sentinel'));
+  }
+
+  window.addEventListener('hashchange', function () { readHash(); applyFilter(false); });
+  readHash();
+  applyFilter(false);
+})();
+</script>
+</body>
+</html>
