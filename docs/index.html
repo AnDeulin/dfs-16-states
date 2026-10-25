@@ -2,13 +2,17 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ДФС — 16 состояний: картины и музыка</title>
-<meta name="description" content="Каталог по методике ДФС И. Н. Калинаускаса: картины, музыка и описания для каждого из 16 состояний.">
+<title>ДФС — спутник практики: пять упражнений в 3D</title>
+<meta name="description" content="Пять практик методики ДФС И. Н. Калинаускаса шаг за шагом в 3D: вращайте фигуру, смотрите каждый шаг, вспоминайте и применяйте. Плюс 16 состояний с картинами и музыкой.">
 <meta name="theme-color" content="#f6f3ec" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#12151c" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
 <style>
+@font-face{font-family:Onest;font-style:normal;font-weight:100 900;font-display:swap;src:url(fonts/onest-cyrillic.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Onest;font-style:normal;font-weight:100 900;font-display:swap;src:url(fonts/onest-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:OnestFallback;src:local("Arial");size-adjust:104%;ascent-override:94%;descent-override:24%}
 :root {
   --bg: #f6f3ec;        --bg-rgb: 246, 243, 236;
   --surface: #ffffff;
@@ -25,8 +29,9 @@
   --radius: 16px;
   --maxw: 1480px;
   --gutter: clamp(14px, 3vw, 28px);
-  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
-  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* одно семейство на весь сайт: Onest (кириллица), заголовки отличаются весом и размером, а не другим шрифтом */
+  --sans: Onest, OnestFallback, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --serif: var(--sans);
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -278,14 +283,43 @@ body.lb-open { overflow: hidden; }
   .desc__panel { grid-template-rows: 1fr !important; }
   .desc__toggle { background: none; border: 0; padding-left: 0; }
 }
+
+/* v4: липкая панель фильтров под верхней панелью сайта */
+.bar { top: var(--topH, 58px); }
+.hero { display: none; }
 </style>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="learn.css">
 </head>
 <body>
-
-<header class="hero wrap">
-  <h1>ДФС — 16 состояний</h1>
-  <p class="hero__method">Методика дифференцированных функциональных состояний И.&nbsp;Н.&nbsp;Калинаускаса</p>
+<header class="top" id="top">
+  <div class="top__in">
+    <a class="brand" href="#/" aria-label="ДФС — на главную"><span class="brand__mark"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><radialGradient id="bf" cx="50%" cy="62%" r="55%"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#cfeaff"/><stop offset="1" stop-color="#7fc4ff"/></radialGradient></defs><path d="M16 2c5 5.5 8 9 8 14a8 8 0 0 1-16 0c0-5 3-8.500 8-14z" fill="url(#bf)"/><path d="M16 12c2.200 2.600 3.400 4.200 3.400 6.200a3.400 3.400 0 0 1-6.800 0c0-2 1.200-3.600 3.400-6.200z" fill="#fff" opacity=".95"/></svg></span><span class="brand__t">ДФС<small>спутник практики</small></span></a>
+    <nav class="ptabs" id="ptabs" aria-label="Пять практик"></nav>
+    <nav class="nav" aria-label="Разделы сайта">
+      <a href="#/states" data-route="states">Состояния</a>
+      <a href="#/about" data-route="about">О методе</a>
+    </nav>
+  </div>
 </header>
+<nav class="tabbar" aria-label="Разделы сайта">
+  <a href="#/" data-route="home"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c2.6 3 4.5 5.4 4.5 8.4A4.5 4.5 0 0 1 12 16a4.5 4.5 0 0 1-4.5-4.6C7.5 8.4 9.4 6 12 3z"/><path d="M12 16v5M8 21h8"/></svg><span>Практики</span></a>
+  <a href="#/states" data-route="states"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg><span>Состояния</span></a>
+  <a href="#/about" data-route="about"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 18H20"/></svg><span>О методе</span></a>
+</nav>
+
+<main class="wrap view" id="view-home"></main>
+<main class="wrap view" id="view-practice" hidden><div id="practice-root"></div></main>
+<main class="wrap view" id="view-about" hidden><div id="about-root"></div></main>
+
+<div class="wrap subhead" id="subhead" hidden>
+  <div class="pagehead"><h1>16 состояний</h1><p>Картины, музыка и описание для каждого сочетания центра и ритма.</p></div>
+  <nav class="seg3" aria-label="Режим">
+    <a href="#/states" data-sub="states">Каталог</a>
+    <a href="#/recall" data-sub="recall">Вспомнить</a>
+    <a href="#/sit" data-sub="sit">В ситуации</a>
+  </nav>
+</div>
 
 <div class="bar-sentinel" id="sentinel"></div>
 <nav class="bar" id="bar" aria-label="Фильтры состояний">
@@ -301,7 +335,7 @@ body.lb-open { overflow: hidden; }
   </div>
 </nav>
 
-<main class="wrap">
+<main class="wrap" id="view-states">
   <div class="toolbar">
     <p class="toolbar__count" id="count" aria-live="polite"></p>
     <div class="toolbar__actions">
@@ -310,10 +344,20 @@ body.lb-open { overflow: hidden; }
     </div>
   </div>
   <section class="grid" id="grid" aria-label="Состояния"></section>
-  <noscript><p>Для работы каталога нужен включённый JavaScript.</p></noscript>
+  <noscript><p>Для работы сайта нужен включённый JavaScript.</p></noscript>
 </main>
 
-<footer class="footer wrap">Методика ДФС — И. Н. Калинаускас. Создано для изучающих ДФС.</footer>
+<main class="wrap view" id="view-recall" hidden></main>
+<main class="wrap view" id="view-sit" hidden></main>
+
+<footer class="footer wrap">
+  <p>Методика ДФС — И. Н. Калинаускас. Создано для изучающих ДФС.</p>
+  <details class="legal"><summary>О сайте</summary>
+    <p>Неофициальный учебный ресурс изучающих методику: не связан с правообладателями и инструкторами и не заменяет обучение у инструктора. Тексты — пересказ и краткие цитаты из книг И.&nbsp;Н.&nbsp;Калинаускаса «Огненный цветок. Методика ДФС» и «Наедине с миром» с указанием источника; описания 16 состояний — по книге «Наедине с миром» (1991). Методика предназначена для здоровых людей от 18 лет; при диагнозах нужна консультация врача. Сайт не оказывает медицинских услуг и не обещает лечебного эффекта.</p>
+    <p>Озвучка шагов — синтез речи <a href="https://github.com/snakers4/silero-models" target="_blank" rel="noopener">Silero</a> (голос aidar), лицензия CC BY-NC 4.0: только некоммерческое использование.</p>
+    <p>Об исправлении или удалении материалов — на странице проекта: <a href="https://github.com/AnDeulin/dfs-16-states/issues" target="_blank" rel="noopener">github.com/AnDeulin/dfs-16-states</a> (раздел Issues).</p>
+  </details>
+</footer>
 
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Просмотр картины">
   <button class="lb__btn lb__close" id="lb-close" type="button" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
@@ -326,6 +370,7 @@ body.lb-open { overflow: hidden; }
 </div>
 
 <script src="data.js"></script>
+<script src="learn-data.js"></script>
 <script>
 (function () {
   'use strict';
@@ -397,7 +442,9 @@ body.lb-open { overflow: hidden; }
   });
   $('#reset').addEventListener('click', function () { filter.c = ''; filter.r = ''; applyFilter(true); });
 
+  function onStates() { return /^#([1-4][A-D]|c[1-4]|r[A-D])$/i.test(location.hash) || location.hash === '#/states'; }
   function readHash() {
+    if (!onStates()) return;
     var h = '';
     try { h = decodeURIComponent(location.hash.replace(/^#/, '')); } catch (err) { h = ''; }
     var m;
@@ -407,11 +454,12 @@ body.lb-open { overflow: hidden; }
     else if ((m = /^r([A-D])$/i.exec(h))) { filter.r = m[1].toUpperCase(); }
   }
   function writeHash() {
+    if (!onStates()) return;
     var h = '';
     if (filter.c && filter.r) h = filter.c + filter.r;
     else if (filter.c) h = 'c' + filter.c;
     else if (filter.r) h = 'r' + filter.r;
-    try { history.replaceState(null, '', h ? '#' + h : location.pathname + location.search); } catch (err) { /* file:// в части браузеров */ }
+    try { history.replaceState(null, '', h ? '#' + h : '#/states'); } catch (err) { /* file:// в части браузеров */ }
   }
 
   /* ---------- Карточки ---------- */
@@ -630,10 +678,11 @@ body.lb-open { overflow: hidden; }
     }).observe($('#sentinel'));
   }
 
-  window.addEventListener('hashchange', function () { readHash(); applyFilter(false); });
+  window.addEventListener('hashchange', function () { if (onStates()) { readHash(); applyFilter(false); } });
   readHash();
   applyFilter(false);
 })();
 </script>
+<script src="app.js"></script>
 </body>
 </html>

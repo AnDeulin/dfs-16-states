@@ -1,0 +1,231 @@
+/* Плеер практик: картинка + субтитры + панель управления + текст шагов сбоку (на телефоне — снизу) */
+.pl { --pl-stage: clamp(300px, 46svh, 520px); display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); margin: 0; }
+.pl__head { min-width: 0; }
+.pl__stagebox { position: relative; min-width: 0; }
+.pl__side { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+@media (min-width: 1024px) {
+  .pl { --pl-stage: clamp(400px, calc(100vh - var(--topH, 58px) - 176px), 760px); grid-template-columns: minmax(0, 1fr) minmax(330px, 380px); gap: 14px 24px; align-items: start; }
+  .pl--has-head { grid-template-areas: "head head" "stage side"; }
+  .pl--has-head .pl__head { grid-area: head; }
+  .pl--has-head .pl__stagebox { grid-area: stage; }
+  .pl--has-head .pl__side { grid-area: side; }
+  /* справа — шаги, высота как у картинки с панелью; текущий шаг раскрыт, остальные — заголовками */
+  .pl__side { height: calc(var(--pl-stage) + 78px); }
+  .pl__cap { display: none; }
+  .pl__all { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+}
+
+/* ---------- картинка ---------- */
+.pl__stage {
+  position: relative; overflow: hidden; border-radius: 24px; outline: none; height: var(--pl-stage);
+  background: radial-gradient(120% 90% at 50% 8%, #20306c 0%, #0c1432 56%, #060a1b 100%);
+  box-shadow: 0 24px 60px rgba(5, 9, 30, .32), inset 0 0 0 1px rgba(255, 255, 255, .07);
+}
+.pl__stage:focus-visible { outline: 3px solid #fff; outline-offset: -4px; }
+.pl__stage::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(1.2px 1.2px at 12% 18%, #fff8 50%, transparent), radial-gradient(1px 1px at 84% 12%, #fff6 50%, transparent), radial-gradient(1.4px 1.4px at 72% 36%, #fff5 50%, transparent),
+    radial-gradient(1px 1px at 20% 62%, #fff5 50%, transparent), radial-gradient(1.2px 1.2px at 92% 72%, #fff4 50%, transparent), radial-gradient(1px 1px at 8% 88%, #fff4 50%, transparent); }
+.pl__view { position: absolute; inset: 0; z-index: 1; --s3-shift: 30px; }
+.s3-canvas { position: absolute; left: 0; top: 0; display: block; cursor: grab; }
+.s3-canvas:active { cursor: grabbing; }
+.s3-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.s3-lab { position: absolute; left: 0; top: 0; margin-top: -11px; display: flex; align-items: center; opacity: 0; white-space: nowrap; color: #fff; font: 600 13px/1 var(--sans); will-change: transform, opacity; transition: opacity .3s; }
+.s3-lab i { flex: none; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px rgba(150, 205, 255, .4), 0 0 12px rgba(150, 205, 255, .9); }
+.s3-lab span { margin-left: 8px; padding: 4px 9px; border-radius: 999px; background: rgba(9, 15, 46, .62); border: 1px solid rgba(255, 255, 255, .16); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+
+/* полоски шагов, как в «историях» */
+.pl__top { position: absolute; z-index: 3; left: 14px; right: 14px; top: 10px; display: flex; align-items: center; gap: 10px; pointer-events: none; }
+.pl__seg { flex: 1; display: flex; gap: 4px; pointer-events: auto; }
+.pl__sg { position: relative; flex: 1; height: 30px; margin: -5px 0; padding: 0; border: 0; background: none; cursor: pointer; }
+.pl__sg::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 4px; margin-top: -2px; border-radius: 4px; background: rgba(255, 255, 255, .22); }
+.pl__sg i { position: absolute; left: 0; top: 50%; height: 4px; margin-top: -2px; width: 0; border-radius: 4px; background: #fff; }
+.pl__sg.is-done i { width: 100%; background: rgba(255, 255, 255, .85); }
+.pl__sg.is-cur i { width: 100%; background: linear-gradient(90deg, #ffe3a0, #ffb85a); }
+.pl.is-playing .pl__sg.is-cur i { width: 0; animation: plfill var(--dur, 6s) linear forwards; }
+@keyframes plfill { from { width: 0; } to { width: 100%; } }
+.pl__n { flex: none; min-width: 44px; text-align: right; color: rgba(255, 255, 255, .78); font: 600 13px var(--sans); font-variant-numeric: tabular-nums; }
+
+.pl__hint { position: absolute; z-index: 3; left: 50%; top: 46px; transform: translateX(-50%); white-space: nowrap; display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; color: #fff; font: 600 13px var(--sans);
+  background: rgba(9, 15, 46, .55); border: 1px solid rgba(255, 255, 255, .16); pointer-events: none; transition: opacity .6s; }
+.pl__hint svg { width: 30px; height: 15px; animation: plnudge 2.2s ease-in-out infinite; }
+@keyframes plnudge { 0%, 100% { transform: translateX(-3px); } 50% { transform: translateX(3px); } }
+.pl__hint.is-gone { opacity: 0; }
+
+/* субтитры: внизу картинки, не больше двух строк, под ними — тёмная подложка; фигура сдвинута вверх (--s3-shift) */
+.pl__sub { position: absolute; z-index: 4; left: 50%; bottom: 16px; transform: translateX(-50%); width: max-content; max-width: min(88%, 46ch); text-align: center; pointer-events: none;
+  opacity: 0; transition: opacity .18s; }
+.pl__sub span { display: inline; padding: 4px 10px; line-height: 1.6; font: 500 clamp(16px, 1.6vw, 20px)/1.55 var(--sans); color: #fff; background: rgba(4, 8, 24, .78); border-radius: 8px;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.pl.is-playing .pl__sub.is-on { opacity: 1; }
+.pl.no-cc .pl__sub { display: none; }
+
+/* ---------- панель управления под картинкой ---------- */
+.pl__bar { position: relative; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin-top: 12px; }
+.pl__bl { justify-self: start; display: flex; gap: 8px; }
+.pl__br { justify-self: end; display: flex; gap: 8px; }
+.pl__ctl { display: flex; align-items: center; gap: 14px; }
+.pl__b { display: grid; place-items: center; width: 52px; height: 52px; padding: 0; border-radius: 50%; color: #fff; cursor: pointer;
+  background: #16214f; border: 1px solid rgba(255, 255, 255, .16); transition: transform .12s, background .15s, opacity .15s; }
+.pl__b:hover { background: #22306e; }
+.pl__b:active { transform: scale(.93); }
+.pl__b[aria-disabled="true"] { opacity: .32; cursor: default; }
+.pl__b svg { width: 22px; height: 22px; }
+.pl__b--main { width: 66px; height: 66px; border: 0; color: #3a2400; background: linear-gradient(145deg, #ffe9b3, #ffb85a); box-shadow: 0 8px 24px rgba(255, 184, 90, .42); }
+.pl__b--main:hover { background: linear-gradient(145deg, #fff0c8, #ffc272); }
+.pl__b--main svg { width: 30px; height: 30px; }
+.pl__ib { display: inline-flex; align-items: center; gap: 8px; height: 44px; min-width: 44px; padding: 0 14px; border-radius: 999px; cursor: pointer; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line); font: 600 14px var(--sans); transition: background .15s, opacity .15s; }
+.pl__ib:hover { border-color: rgba(var(--ink-rgb), .35); }
+.pl__ib svg { width: 20px; height: 20px; flex: none; }
+.pl__ib .x { display: none; }
+.pl__ib.is-off .w1, .pl__ib.is-off .w2 { display: none; }
+.pl__ib.is-off .x { display: inline; }
+.pl__ib[aria-pressed="false"] { color: var(--muted); }
+.pl__ib--cc[aria-pressed="false"] svg { opacity: .55; }
+.pl__ib:focus-visible, .pl__b:focus-visible, .pl__opt:focus-visible { outline: 3px solid #8fd0ff; outline-offset: 2px; }
+@media (max-width: 1279px) { .pl__ibt { display: none; } .pl__ib { padding: 0; width: 44px; justify-content: center; } }
+
+/* меню настроек: на ПК — окошко над панелью, на телефоне — шторка снизу */
+.pl__menu { position: absolute; z-index: 30; right: 0; bottom: calc(100% + 10px); width: min(360px, 92vw); padding: 14px 16px 16px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line);
+  box-shadow: 0 18px 48px rgba(10, 14, 30, .28); display: grid; gap: 12px; color: var(--ink); }
+.pl__menu[hidden] { display: none; }
+.pl__mg { display: grid; gap: 7px; }
+.pl__mg[hidden] { display: none; }
+.pl__mh { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.pl__seg2 { display: flex; flex-wrap: wrap; gap: 6px; }
+.pl__opt { height: 38px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 600 14px var(--sans); cursor: pointer; }
+.pl__opt.is-on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.pl__sw { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 15px; font-weight: 600; cursor: pointer; }
+.pl__sw[hidden] { display: none; }
+.pl__sw input { width: 20px; height: 20px; accent-color: #d98a1f; }
+.pl__vnote { margin: 0; font-size: 13px; line-height: 1.45; color: var(--muted); }
+.pl__vnote:empty { display: none; }
+
+/* ---------- текст шагов ---------- */
+.pl__cap { padding: 16px 18px 18px; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); }
+.pl__k { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.pl__ct { margin: 4px 0 0; font: 700 21px/1.25 var(--sans); letter-spacing: -.01em; }
+.pl__cd { margin: 8px 0 0; font-size: 17px; line-height: 1.6; }
+.ch { border-radius: 4px; transition: background .2s, color .2s; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.ch.is-now { background: rgba(255, 196, 92, .32); }
+.pl__go { width: 100%; height: 50px; margin-top: 14px; border-radius: 14px; border: 1.5px solid rgba(var(--ink-rgb), .26); background: transparent; color: var(--ink); font: 700 16px var(--sans); cursor: pointer; }
+.pl.is-last .pl__go { border: 0; background: linear-gradient(145deg, #ffe3a0, #ffb85a); color: #3a2400; box-shadow: 0 6px 18px rgba(255, 184, 90, .35); }
+
+.pl__all { padding: 6px; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); }
+.pl__allh { margin: 6px 10px 6px; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.pl__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.pl__li { border-radius: 14px; }
+.pl__it { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; min-height: 46px; padding: 6px 10px; border-radius: 14px; border: 0; background: transparent; color: var(--muted); cursor: pointer; font: inherit; }
+.pl__it:hover { background: var(--surface-2); color: var(--ink); }
+.pl__num { flex: none; display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--surface-2); font-size: 12.5px; font-weight: 700; color: var(--muted); }
+.pl__t { font-size: 15px; font-weight: 600; line-height: 1.3; }
+.pl__lt { display: none; margin: 0; padding: 0 14px 14px 48px; font-size: 16px; line-height: 1.6; color: var(--ink); }
+.pl__li.is-active { background: var(--surface-2); }
+.pl__li.is-active .pl__it { color: var(--ink); }
+.pl__li.is-active .pl__num { background: linear-gradient(145deg, #ffe3a0, #ffb85a); color: #3a2400; }
+@media (min-width: 1024px) { .pl__li.is-active .pl__lt { display: block; } .pl__li.is-active .pl__t { font-size: 16.5px; } }
+.pl__note { margin: 0; padding: 12px 14px; border-radius: 16px; font-size: 14px; line-height: 1.5; color: var(--muted); background: rgba(var(--C-rgb), .08); border: 1px solid rgba(var(--C-rgb), .28); }
+.pl__note a { color: var(--ink); font-weight: 700; text-underline-offset: 3px; }
+
+/* запасной вариант: плоская сцена */
+.pl--svg .pl__view, .pl--fallback .pl__view { display: grid; place-items: center; padding: 38px 8px 12px; }
+.pl--svg .pl__view svg, .pl--fallback .pl__view svg { position: static; width: 100%; height: 100%; max-height: 100%; }
+
+/* ---------- телефон и планшет ---------- */
+@media (max-width: 1023px) {
+  .pl--has-head .pl__head, .pl--has-head .pl__side { display: contents; }
+  .pl__cap { order: 3; }
+  .pl__note { order: 4; }
+  .pl__all { order: 5; }
+  .pl__go { display: none; }
+  .pl.is-last .pl__go { display: block; }
+  .pl__stage { border-radius: 20px; }
+}
+@media (max-width: 600px) {
+  .pl { --pl-stage: clamp(280px, 50svh, 470px); gap: 12px; }
+  .pl__view { --s3-shift: 24px; }
+  .pl__ib--cc { display: none; }
+  .pl__ctl { gap: 10px; }
+  .pl__menu { position: fixed; left: 0; right: 0; bottom: 0; width: auto; border-radius: 22px 22px 0 0; padding: 16px 18px calc(18px + env(safe-area-inset-bottom)); z-index: 95;
+    box-shadow: 0 -12px 40px rgba(10, 14, 30, .3); }
+  .pl__sub span { font-size: 16.5px; }
+}
+@media (max-width: 370px) { .pl__b { width: 46px; height: 46px; } .pl__b--main { width: 60px; height: 60px; } }
+@media (max-height: 700px) and (max-width: 600px) { .pl { --pl-stage: clamp(250px, 44svh, 400px); } }
+@media (prefers-reduced-motion: reduce) {
+  .pl__hint svg, .pl.is-playing .pl__sg.is-cur i { animation: none !important; }
+}
+
+/* ---------- HTML-слои поверх 3D ---------- */
+.s3-html { position: absolute; z-index: 2; pointer-events: none; visibility: hidden; opacity: 0; transition: none; }
+.s3-gauges { right: 14px; top: 52px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.s3-gauge svg { display: block; width: 54px; height: 54px; }
+.s3-gauge .needle { animation: gneedle 3.8s ease-in-out infinite; }
+@keyframes gneedle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+.s3-gauges span { margin-top: 2px; font: 600 12px var(--sans); color: rgba(255, 255, 255, .85); text-shadow: 0 1px 6px #000a; }
+.s3-chip { left: 50%; top: 80px; transform: translateX(-50%); white-space: nowrap; padding: 7px 14px; border-radius: 999px; color: #fff; font: 700 13.5px var(--sans); background: rgba(9, 15, 46, .62); border: 1px solid rgba(255, 255, 255, .2); }
+.s3-chart { position: absolute; z-index: 2; left: 14px; top: 44px; width: min(52%, 250px); padding: 6px 8px 4px; border-radius: 14px; background: rgba(9, 15, 46, .5); border: 1px solid rgba(255, 255, 255, .14); pointer-events: none; }
+.s3-chart svg { display: block; width: 100%; }
+.s3-chart .ax { font: 700 10px var(--sans); fill: rgba(255, 255, 255, .78); }
+.s3-chart .m { opacity: .18; transition: opacity .5s; }
+.s3-chart .m.on { opacity: 1; }
+.s3-chart .m circle { fill: #ffd27a; }
+.s3-chart .m text { font: 800 8px var(--sans); fill: #3a2400; }
+.s3-time { left: 14px; right: 14px; top: 44px; display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 14px; color: #fff; font: 600 12px var(--sans); background: rgba(9, 15, 46, .55); border: 1px solid rgba(255, 255, 255, .14); flex-wrap: wrap; }
+.s3-time .tl { position: relative; flex: 1; min-width: 90px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, .25); }
+.s3-time .tl i { position: absolute; top: -4px; left: 0; width: 12px; height: 12px; border-radius: 50%; background: #ffd27a; animation: tlrun 7s linear infinite; }
+@keyframes tlrun { from { left: 0; } to { left: calc(100% - 12px); } }
+.s3-time b { flex-basis: 100%; font-size: 11.5px; color: rgba(255, 255, 255, .75); font-weight: 600; }
+.s3-four { left: 50%; top: 52px; transform: translateX(-50%); font: 800 clamp(40px, 8vw, 64px)/1 var(--sans); color: #fff; text-shadow: 0 0 24px rgba(160, 210, 255, .9); }
+.pl__stage--day { background: linear-gradient(180deg, #1f3f86 0%, #4f7fcd 46%, #a9cdf0 74%, #d9e8f3 100%); }
+.pl__stage--day::before { display: none; }
+@media (prefers-reduced-motion: reduce) { .s3-gauge .needle, .s3-time .tl i { animation: none !important; } }
+
+/* ================= правки по эталонам 26.10.2026 ================= */
+/* подсказка «потяните» — сбоку, не поверх головы, и только один раз */
+.pl__hint { left: 14px; top: 44px; transform: none; }
+.pl__hint[hidden] { display: none; }
+/* субтитры: размер из настроек; на шагах, где действие внизу, — наверху */
+.pl__sub { max-width: min(88%, 44ch); }
+.pl.sub-s .pl__sub span { font-size: clamp(14px, 1.3vw, 17px); }
+.pl.sub-l .pl__sub span { font-size: clamp(19px, 2vw, 25px); }
+.pl__sub--top { top: 46px; bottom: auto; }
+@media (max-width: 600px) { .pl__sub { max-width: min(92%, 34ch); } }
+/* список шагов: на ПК всегда раскрыт (заголовок списка — просто подпись), на телефоне раскрывается по нажатию */
+.pl__all > summary { list-style: none; cursor: pointer; }
+.pl__all > summary::-webkit-details-marker { display: none; }
+@media (min-width: 1024px) { .pl__all > summary { pointer-events: none; } }
+@media (max-width: 1023px) {
+  .pl__all { padding: 0; }
+  .pl__all > summary { display: flex; align-items: center; min-height: 52px; margin: 0; padding: 0 16px; font-size: 13px; }
+  .pl__all > summary::after { content: ""; margin-left: auto; width: 9px; height: 9px; border-right: 2.2px solid var(--muted); border-bottom: 2.2px solid var(--muted); transform: rotate(45deg); transition: transform .2s; }
+  .pl__all[open] > summary::after { transform: rotate(-135deg); }
+  .pl__all .pl__list { padding: 0 6px 8px; }
+  /* во время показа с субтитрами под пультом остаётся только название шага, на паузе — весь текст */
+  .pl.is-playing:not(.no-cc) .pl__cd { display: none; }
+  body.pl-on .tabbar { transform: translateY(110%); }
+  .tabbar { transition: transform .25s ease; }
+}
+.pl__ib--full .f2 { display: none; }
+.pl--full .pl__ib--full .f1 { display: none; }
+.pl--full .pl__ib--full .f2 { display: inline; }
+
+/* «Режим практики»: картинка на весь экран, панель поверх и прячется сама */
+.pl--full .pl__stagebox { position: fixed; inset: 0; z-index: 300; margin: 0; background: #060a1b; display: flex; flex-direction: column; }
+.pl--full .pl__stage { flex: 1; height: auto; border-radius: 0; box-shadow: none; }
+.pl--full .pl__bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; margin: 0; padding: 18px max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  background: linear-gradient(0deg, rgba(4, 8, 24, .86), rgba(4, 8, 24, 0)); transition: opacity .3s; }
+.pl--full .pl__ib { background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .22); color: #fff; }
+.pl--full .pl__ib[aria-pressed="false"] { color: rgba(255, 255, 255, .6); }
+.pl--full .pl__top { transition: opacity .3s; }
+.pl--full:not(.ui-on) .pl__bar, .pl--full:not(.ui-on) .pl__top { opacity: 0; pointer-events: none; }
+.pl--full .pl__sub { bottom: 104px; transition: bottom .3s, opacity .18s; }
+.pl--full:not(.ui-on) .pl__sub { bottom: 6%; }
+.pl--full .pl__sub--top { top: 46px; bottom: auto; }
+.pl--full .pl__sub span { font-size: clamp(19px, 2.4vw, 26px); }
+.pl--full.sub-s .pl__sub span { font-size: clamp(16px, 1.8vw, 20px); }
+.pl--full.sub-l .pl__sub span { font-size: clamp(22px, 3vw, 32px); }
+.pl--full .pl__menu { bottom: calc(100% - 8px); }
+body.pl-full-on { overflow: hidden; }
+body.pl-full-on .tabbar, body.pl-full-on .top { visibility: hidden; }
+@media (max-width: 600px) { .pl--full .pl__menu { bottom: 0; } }
